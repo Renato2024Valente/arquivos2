@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urna Eletrônica</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .urna-container {
+            width: 850px;
+            height: 400px;
+            background-color: #eaeaea;
+            border: 10px solid #000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .urna-screen {
+            width: 58%;
+            height: 100%;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            border: 5px solid #000;
+        }
+
+        #input-numero {
+            width: 150px;
+            font-size: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 2px solid #333;
+        }
+
+        #nome-candidato {
+            font-size: 20px;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        .urna-keyboard {
+            width: 36%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: #d1d1d1;
+            border-radius: 8px;
+        }
+
+        .urna-keyboard-row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .urna-keyboard button {
+            width: 100px;
+            height: 50px;
+            font-size: 16px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            border: 2px solid #333;
+            background-color: #333;
+            color: white;
+            box-shadow: 0 5px #666;
+            transition: all 0.2s ease;
+        }
+
+        .urna-keyboard button:active {
+            box-shadow: 0 2px #666;
+            transform: translateY(4px);
+        }
+
+        #btn-branco {
+            background-color: white;
+            color: black;
+            border: 2px solid black;
+            box-shadow: 0 5px #bbb;
+        }
+
+        #btn-branco:active {
+            box-shadow: 0 2px #383737;
+            transform: translateY(4px);
+        }
+
+        #btn-corrige {
+            background-color: orange;
+            color: white;
+            box-shadow: 0 5px #cc7a00;
+        }
+
+        #btn-corrige:active {
+            box-shadow: 0 2px #cc7a00;
+            transform: translateY(4px);
+        }
+
+        #btn-confirma {
+            background-color: green;
+            color: white;
+            box-shadow: 0 5px #004d00;
+        }
+
+        #btn-confirma:active {
+            box-shadow: 0 2px #004d00;
+            transform: translateY(4px);
+        }
+
+        #config-btn, #result-btn {
+            position: absolute;
+            top: 20px;
+            background-color: #2c2b2b;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        #config-btn {
+            right: 20px;
+        }
+
+        #result-btn {
+            right: 80px;
+        }
+
+        #config-btn i, #result-btn i {
+            font-size: 24px;
+        }
+
+        .add-candidate-container {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            border: 2px solid #000;
+            border-radius: 8px;
+            background-color: #f0f0f0;
+        }
+
+        .add-candidate-container input {
+            padding: 10px;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        #btn-add-candidate {
+            background-color: blue;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        /* Ajustes para a imagem do candidato caber perfeitamente no espaço */
+        #foto-candidato {
+            width: 70%;
+            height: auto;
+            max-height: 200px; /* Limita a altura da imagem */
+            object-fit: cover; /* Garante que a imagem preencha o espaço sem distorcer */
+            margin-top: 10px;
+            border-radius: 5px;
+            border: 2px solid #333;
+        }
+    </style>
+</head>
+<body>
+    <button id="config-btn" onclick="toggleConfig()">
+        <i class="fas fa-cog"></i>
+    </button>
+
+    <button id="result-btn" onclick="solicitarSenhaResultado()">
+        <i class="fas fa-chart-bar"></i>
+    </button>
+
+    <div class="urna-container">
+        <div class="urna-screen">
+            <!-- Mantemos essa imagem e ela será trocada pela foto do candidato -->
+            <img id="foto-candidato" src="urna.jpeg" alt="Justiça Eleitoral">
+            <p id="nome-candidato">Digite o número do candidato:</p>
+            <input type="text" id="input-numero" maxlength="2" readonly>
+        </div>
+
+        <div class="urna-keyboard">
+            <div class="urna-keyboard-row">
+                <button onclick="addNumero(1)">1</button>
+                <button onclick="addNumero(2)">2</button>
+                <button onclick="addNumero(3)">3</button>
+            </div>
+            <div class="urna-keyboard-row">
+                <button onclick="addNumero(4)">4</button>
+                <button onclick="addNumero(5)">5</button>
+                <button onclick="addNumero(6)">6</button>
+            </div>
+            <div class="urna-keyboard-row">
+                <button onclick="addNumero(7)">7</button>
+                <button onclick="addNumero(8)">8</button>
+                <button onclick="addNumero(9)">9</button>
+            </div>
+            <div class="urna-keyboard-row">
+                <button id="btn-branco" onclick="branco()">BRANCO</button>
+                <button onclick="addNumero(0)">0</button>
+                <button id="btn-corrige" onclick="corrige()">CORRIGE</button>
+            </div>
+            <button id="btn-confirma" onclick="confirma()">CONFIRMA</button>
+        </div>
+    </div>
+
+    <div class="add-candidate-container" id="config-section">
+        <h2>Adicionar Candidato</h2>
+        <input type="text" id="numero-candidato" placeholder="Número" maxlength="2">
+        <input type="text" id="nome-candidato-input" placeholder="Nome do Candidato">
+        <input type="file" id="foto-candidato-input" accept="image/*">
+        <button id="btn-add-candidate" onclick="solicitarSenhaAdicionar()">Adicionar</button>
+    </div>
+
+    <audio id="audio-confirma">
+        <source src="urna.wav" type="audio/wav">
+    </audio>
+    
+    <script>
+        let votos = {};
+        let votoAtual = '';
+        let votoBranco = 0;
+        const senhaAdicionar = "123";
+        const senhaResultado = "1234";
+
+        function addNumero(numero) {
+            let input = document.getElementById('input-numero');
+            if (input.value.length < 2) {
+                input.value += numero;
+                if (input.value.length === 2) {
+                    mostrarCandidato(input.value);
+                }
+            }
+        }
+
+        function mostrarCandidato(numero) {
+            let nomeCandidato = document.getElementById('nome-candidato');
+            let fotoCandidato = document.getElementById('foto-candidato');
+            if (votos[numero]) {
+                nomeCandidato.textContent = `Número: ${numero} - Candidato: ${votos[numero].nome}`;
+                fotoCandidato.src = votos[numero].foto;  // Atualiza a foto do candidato
+                votoAtual = numero;
+            } else {
+                nomeCandidato.textContent = 'Voto Nulo';
+                fotoCandidato.src = "urna.jpeg";  // Mantém a imagem original para votos nulos
+                votoAtual = 'nulo';
+            }
+        }
+
+        function branco() {
+            document.getElementById('input-numero').value = '';
+            document.getElementById('nome-candidato').textContent = 'Voto em Branco';
+            document.getElementById('foto-candidato').src = "urna.jpeg";  // Mantém a imagem original
+            votoAtual = 'branco';
+        }
+
+        function corrige() {
+            document.getElementById('input-numero').value = '';
+            document.getElementById('nome-candidato').textContent = '';
+            document.getElementById('foto-candidato').src = "urna.jpeg";  // Volta para a imagem original
+            votoAtual = '';
+        }
+
+        function confirma() {
+            if (votoAtual === 'branco') {
+                votoBranco++;
+            } else if (votoAtual === 'nulo') {
+            } else if (votos[votoAtual]) {
+                votos[votoAtual].votos++;
+            }
+            playConfirmaSound();
+            corrige();
+        }
+
+        function playConfirmaSound() {
+            let audio = document.getElementById('audio-confirma');
+            audio.play().catch(function(error) {
+                console.log('Erro ao reproduzir o áudio:', error);
+            });
+        }
+
+        function solicitarSenhaAdicionar() {
+            const senha = prompt("Digite a senha para adicionar candidatos:");
+            if (senha === senhaAdicionar) {
+                adicionarCandidato();
+            } else {
+                alert("Senha incorreta!");
+            }
+        }
+
+        function solicitarSenhaResultado() {
+            const senha = prompt("Digite a senha para ver o resultado:");
+            if (senha === senhaResultado) {
+                mostrarResultado();
+            } else {
+                alert("Senha incorreta!");
+            }
+        }
+
+        function mostrarResultado() {
+            let totalVotos = 0;
+            let vencedor = '';
+            let maiorVotos = 0;
+            let resultado = 'Resultado da Urna:\n\n';
+
+            for (let num in votos) {
+                totalVotos += votos[num].votos;
+            }
+
+            for (let num in votos) {
+                let percentual = ((votos[num].votos / totalVotos) * 100).toFixed(2);
+                resultado += `${votos[num].nome}: ${votos[num].votos} votos (${percentual}%)\n`;
+
+                if (votos[num].votos > maiorVotos) {
+                    maiorVotos = votos[num].votos;
+                    vencedor = votos[num].nome;
+                }
+            }
+
+            resultado += `\nVotos em Branco: ${votoBranco}`;
+            resultado += `\n\nVencedor: ${vencedor} com ${((maiorVotos / totalVotos) * 100).toFixed(2)}% dos votos`;
+
+            alert(resultado);
+        }
+
+        function adicionarCandidato() {
+            let numero = document.getElementById('numero-candidato').value;
+            let nome = document.getElementById('nome-candidato-input').value;
+            let foto = URL.createObjectURL(document.getElementById('foto-candidato-input').files[0]);
+
+            if (numero.length === 2 && nome !== '') {
+                votos[numero] = { nome: nome, foto: foto, votos: 0 };
+                alert(`Candidato ${nome} com número ${numero} adicionado com sucesso!`);
+            } else {
+                alert('Por favor, insira um número de 2 dígitos, nome e uma foto válida.');
+            }
+
+            document.getElementById('numero-candidato').value = '';
+            document.getElementById('nome-candidato-input').value = '';
+            document.getElementById('foto-candidato-input').value = '';
+        }
+
+        function toggleConfig() {
+            const configSection = document.getElementById("config-section");
+            if (configSection.style.display === "none" || configSection.style.display === "") {
+                configSection.style.display = "block";
+            } else {
+                configSection.style.display = "none";
+            }
+        }
+    </script>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</body>
+</html>
